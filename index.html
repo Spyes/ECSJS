@@ -1,9 +1,35 @@
 <!DOCTYPE html>
 <html>
-  <head></head>
+  <head>
+    <style>
+     #app {
+	 position: absolute;
+	 width: 800px;
+	 height: 600px;
+     }
+     .cell {
+	 float: left;
+	 border: 1px solid black;
+	 height: calc(99% / 3); /* 99% to compensate for border or some shit */
+	 width: calc(99% / 3);
+     }
+
+     .clickable {
+	 cursor: pointer;
+     }
+    </style>
+  </head>
   <body>
     <div id="app">
-      <div id="location1"></div>
+      <div class="cell NW"></div>
+      <div class="cell N"></div>
+      <div class="cell NE"></div>
+      <div class="cell W"></div>
+      <div class="cell C"></div>
+      <div class="cell E"></div>
+      <div class="cell SW"></div>      
+      <div class="cell S"></div>      
+      <div class="cell SE"></div>      
     </div>
     <script src="./main.js"></script>
   </body>
