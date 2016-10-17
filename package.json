@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "webpack-dev-server --progress --colors",
     "test": "mocha --compilers babel-core/register --require ./test/helper.js --recursive",
     "test:watch": "npm run test -- --watch"
   },
@@ -17,6 +18,8 @@
     "chai-immutable": "^1.6.0",
     "immutable": "^3.8.1",
     "mocha": "^3.1.2",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.2"
   }
 }
