@@ -29,6 +29,7 @@ function Store() {
   this.data = {};
   this.subscribers = {};
   this.getStore = () => this.data;
+  this.test;
   this.get = (reducer, defaultValue) => result(this.data, reducer, defaultValue);
   this.dispatch = function (action) {
     const { type, component, entity } = action;
@@ -39,24 +40,38 @@ function Store() {
         break;
 
       case "ADD_COMPONENT":
-        const { id } = entity;
-        const found_entity =
+        var found_entity =
           this.data
               .entities
-              .find(entity => entity.id === id);
+              .find(e => e.id === entity.id);
         if (!found_entity) break;
         found_entity.components.push(component);
         break;
-      case "CHANGE_LOCATION":
-        const ent = this.data
-			.entities
-			.find(e => e.id === entity);
-	const pos_comp = getComponent(ent, "Position");
-	pos_comp.data.location = action.location;
+
+      case "UPDATE_COMPONENT":
+	var found_entity =
+	  this.data
+	      .entities
+	      .find(e => e.id === entity.id);
+	if (!found_entity) {
+	  log("No such entity", entity);
+	  break;
+	}
+	const comp_index =
+	  found_entity.components
+		      .findIndex(comp => comp.name === component);
+	if (comp_index > -1) {
+	  if (!found_entity.components[comp_index]) {
+	    found_entity.components[comp_index] = { data: {} };
+	  }
+	  found_entity.components[comp_index].data = action.data;
+	}
+	break;
+
       default:
         break;
     }
-    if (type) {
+    if (type) {  // broadcast to subscribers
       result(this.subscribers, [type], []).map(fun => { fun(type, entity) });
     }
   };
@@ -112,6 +127,11 @@ const RenderComponent = ({model: model} = {model: ''}) => ({
 const ClickComponent = ({onClick: onClick} = {onClick: () => {}}) => ({
   name: "Click",
   data: { onClick }
+});
+
+const HealthComponent = ({health: health} = {health: 5}) => ({
+  name: "Health",
+  data: { health }
 });
 
 /*** SIDE EFFECTS ***/
@@ -174,14 +194,21 @@ class RenderSystem extends System {
     const position_comp = getComponent(entity, "Position");
     const render_comp = getComponent(entity, "Render");
     const clickable_comp = getComponent(entity, "Click");
+    const health_comp = getComponent(entity, "Health");
+
     const { location } = position_comp.data;
     const el = document.getElementsByClassName(location).item(0);
     if (!el) {
       log("Position component points to a location that doesn't exist", entity.id, position_comp);
       return;
     }
+
     const model = result(render_comp, ['data', 'model']);
-    const className = clickable_comp.data ? 'clickable' : '';
+    let className = clickable_comp.data ? ' clickable ' : '';
+
+    if (health_comp) {
+      className += health_comp.data.health <= 0 ? ' dead ' : '';
+    }
     if (model) el.innerHTML = `<span class='${className}'>${ model }</span>`;
     const action = { type: "ON_CLICK", entity };
     el.onclick = () => { this.store.dispatch(action); };
@@ -226,7 +253,7 @@ const getPositionByIndex = (idx) => {
 }
 
 const onClick = (entity) => {
-  // do something
+  console.log('toggle ', entity);
 }
 const createCell = (idx) => {
   const entity = createEntity(store);
@@ -234,15 +261,33 @@ const createCell = (idx) => {
 	       PositionComponent({ location: getPositionByIndex(idx) }),
 	       store);
   addComponent(entity,
+	       HealthComponent({health: 0}),
+	       store);
+  addComponent(entity,
 	       ClickComponent({onClick}),
 	       store);
   addComponent(entity,
-	       RenderComponent({model: "xxx"}),
+	       RenderComponent(),
 	       store);
   return entity;
 };
 const cells = times(9, (_, i) => createCell(i));
 const [head, ...rest] = cells;
-store.dispatch({ type: "CHANGE_LOCATION", entity: head.id, location: "N" });
+
+let action = {
+  type: "UPDATE_COMPONENT",
+  entity: head,
+  component: "Position",
+  data: { location: "SE" }
+};
+store.dispatch(action);
+
+action = {
+  type: "UPDATE_COMPONENT",
+  entity: head,
+  component: "Render",
+  data: { model: "X" }
+};
+store.dispatch(action);
 
 systems.map(system => system.execute());
