@@ -1,22 +1,11 @@
-/* UTIL */
 import { log, times, result } from './Utils';
-
-/* STORE */
 import Store from './Store';
-
-/* ENTITY */
 import Entity, { createEntity,
 		 addComponent,
 		 getComponent,
 		 hasComponents } from './Entity';
-
-/* COMPONENTS */
 import * as Component from './Components';
-
-/* ASSEMBLAGES */
 import * as Assemblage from './Assemblages';
-
-/* SYSTEMS */
 import * as System from './Systems';
 
 /** MAIN **/
