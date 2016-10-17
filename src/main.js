@@ -5,20 +5,19 @@ import { log, times, result } from './Utils';
 import Store from './Store';
 
 /* ENTITY */
-import Entity, { createEntity, getComponent, hasComponents } from './Entity';
+import Entity, { createEntity,
+		 addComponent,
+		 getComponent,
+		 hasComponents } from './Entity';
 
 /* COMPONENTS */
 import * as Component from './Components';
 
+/* ASSEMBLAGES */
+import * as Assemblage from './Assemblages';
+
 /* SYSTEMS */
 import * as System from './Systems';
-
-/*** SIDE EFFECTS ***/
-const addComponent = (entity, component, store) => {
-  const action = { type: "ADD_COMPONENT", entity, component };
-  store.dispatch(action);
-};
-
 
 /** MAIN **/
 const store = new Store();
@@ -54,27 +53,36 @@ const getPositionByIndex = (idx) => {
 }
 
 const globalClick = () => {};
-const clickCell = (entity) => {
-  console.error( entity.components.find(comp => comp.name === "Render"));
-  entity.components.find(comp => comp.name === "Render").data.model = "X";
-};
+
 const createCell = (idx) => {
-  const entity = createEntity(store);
-  addComponent(entity,
-	       Component.Position({ location: getPositionByIndex(idx) }),
-	       store);
-  addComponent(entity,
-	       Component.Click({onClick: clickCell}),
-	       store);
-  addComponent(entity,
-	       Component.Render(),
-	       store);
-  return entity;
+  const cell = Assemblage.Cell(store);
+  const comp = getComponent(cell, "Position");
+  comp.data.location = getPositionByIndex(idx);
+  let action = {
+    type: 'UPDATE_COMPONENT',
+    entity: cell,
+    component: 'Position',
+    data: comp.data
+  };
+  store.dispatch(action);
 };
 const cells = times(9, (_, i) => createCell(i));
 
 const turn = createEntity(store);
 addComponent(turn, Component.Count(), store);
-addComponent(turn, Component.Click({onClick: globalClick, global: true}), store);
+addComponent(turn,
+	     Component.Click({
+	       onClick: globalClick,
+	       global: true
+	     }),
+	     store);
 
-systems.map(system => system.execute());
+let _running = true;
+function GameLoop() {
+  systems.map(system => system.execute());
+  if (_running !== false) {
+    requestAnimationFrame(GameLoop);
+  }
+}
+requestAnimationFrame(GameLoop);
+

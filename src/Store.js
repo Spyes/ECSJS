@@ -3,7 +3,7 @@ import { result } from './Utils';
 
 export default function Store() {
   this.data = Map({
-    entities: List()
+    entities: Map()
   });
   this.subscribers = {};
   this.getStore = () => this.data.toJS();
@@ -20,33 +20,22 @@ export default function Store() {
     switch (type) {
       case "ENTITY_CREATED":
         this.data =
-	  this.data.update('entities', ents => ents.push(fromJS(entity)));
+	  this.data.setIn(['entities', entity.id], fromJS(entity));
         break;
 
       case "ADD_COMPONENT":
-	const found_entity = this.data
-				 .get('entities', List())
-				 .findIndex(e => e.get('id') === entity.id);
 	this.data =
-	  this.data.updateIn(['entities', found_entity, 'components'], [],
+	  this.data.updateIn(['entities', entity.id, 'components'], [],
 			     comps => comps.push(fromJS(component)))
         break;
 
       case "UPDATE_COMPONENT":
-	var entidx =
-	  this.data
-	      .get('entities', List())
-	      .findIndex(e => e.get('id') === entity.id);
-	if (entidx < 0) {
-	  log({error: ["No such entity", entity]});
-	  break;
-	}
 	const compidx =
 	  this.data
-	      .getIn(['entities', entidx, 'components'])
+	      .getIn(['entities', entity.id, 'components'])
 	      .findIndex(comp => comp.get('name') === component);
 	this.data =
-	  this.data.updateIn(['entities', entidx, 'components', compidx], Map({data: Map()}),
+	  this.data.updateIn(['entities', entity.id, 'components', compidx], Map({data: Map()}),
 			     comp => comp.set('data', fromJS(action.data)));
 	break;
 

@@ -25,7 +25,7 @@ export default class ClickSystem extends System {
 	});
 
 	let click_comp = getComponent(entity, "Click");
-	click_comp.getIn(['data', 'onClick'])(entity.toJS());
+	click_comp.getIn(['data', 'onClick'], () => {}).call(this, entity.toJS());
 	break;
       default: break;
     }
