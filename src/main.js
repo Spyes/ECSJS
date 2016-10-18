@@ -2,7 +2,7 @@ import { log, times } from './Utils';
 import Store from './Store';
 import Entity, { createEntity,
 		 addComponent,
-		 getComponent,
+		 getComponentData,
 		 hasComponents } from './Entity';
 import * as Component from './Components';
 import * as Assemblage from './Assemblages';
@@ -45,13 +45,13 @@ const globalClick = () => {};
 
 const createCell = (idx) => {
   const cell = Assemblage.Cell(store);
-  const comp = getComponent(cell, "Position");
-  comp.data.location = getPositionByIndex(idx);
+  const data = getComponentData(cell, "Position");
+  data.location = getPositionByIndex(idx);
   let action = {
     type: 'UPDATE_COMPONENT',
     entity: cell,
     component: 'Position',
-    data: comp.data
+    data
   };
   store.dispatch(action);
 };

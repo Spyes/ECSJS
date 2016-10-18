@@ -1,9 +1,9 @@
 import { uniqueId } from './Utils';
-import { Iterable } from 'immutable';
+import { Map, Iterable } from 'immutable';
 
-const Entity = () => (
+const Entity = ({id: id} = {id: uniqueId()}) => (
   {
-    id: uniqueId(),
+    id,
     components: []
   }
 );
@@ -21,16 +21,23 @@ export const addComponent = (entity, component, store) => {
   store.dispatch(action);
 };
 
-export const getComponent = (entity, component_name) => {
-  if (Iterable.isIterable(entity)) return entity.get('components')
-				       .find(component =>
-					 component.get('name') === component_name)
-  return entity.components
-	       .find(component =>
-		 component.name === component_name)
+export const getComponentData = (entity, component_name) => {
+  const component = getComponent(entity, component_name);
+  const is_iter = Iterable.isIterable(component);
+  if (is_iter) return component.get('data', Map());
+  return component.data || {};
 };
 
-export const hasComponents = (entity, component_names) => (
+export const getComponent = (entity, component_name) => {
+  const is_iter = Iterable.isIterable(entity);
+  const components = is_iter ? entity.get('components') : entity.components;
+  return components.find(component => {
+    if (is_iter) return component.get('name') === component_name;
+    return component.name === component_name
+  })
+};
+
+export const hasComponents = (entity, component_names = []) => (
   component_names.reduce((prev, curr) => (
     prev && getComponent(entity, curr) !== undefined
   ), true)

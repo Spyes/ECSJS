@@ -1,14 +1,16 @@
-import { createEntity, addComponent } from '../Entity';
+import { createEntity,
+	 addComponent,
+	 getComponentData } from '../Entity';
 import { Position, Click, Render } from '../Components';
 
 function clickCell(entity) {
-  const comp = entity.components.find(comp => comp.name === "Render");
-  comp.data.model = "X";
+  const data = getComponentData(entity, "Render");
+  data.model = "X";
   let action = {
     type: 'UPDATE_COMPONENT',
     entity: entity,
     component: 'Render',
-    data: comp.data
+    data: data
   };
   this.store.dispatch(action);
 }
