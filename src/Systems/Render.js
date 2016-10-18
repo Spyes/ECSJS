@@ -1,6 +1,5 @@
 import System from '../System';
 import { getComponent } from '../Entity';
-import { result } from '../Utils';
 
 export default class RenderSystem extends System {
   constructor(props) {

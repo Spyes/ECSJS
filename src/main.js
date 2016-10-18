@@ -1,4 +1,4 @@
-import { log, times, result } from './Utils';
+import { log, times } from './Utils';
 import Store from './Store';
 import Entity, { createEntity,
 		 addComponent,
