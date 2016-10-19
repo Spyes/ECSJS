@@ -5,9 +5,17 @@ export default class TurnSystem extends System {
   constructor(props) {
     super(props);
     this.subscribe = this.subscribe.bind(this);
+    this.checkEndGame = this.checkEndGame.bind(this);
+
     this.store.subscribe(["CHECK_COMPLETE", 'TURN_COMPLETE'], this.subscribe);
   }
 
+  checkEndGame() {
+    const turn = this.getEntities()[0];
+    const count_comp = getComponentData(turn, "Count");
+    return count_comp.count >= 9;
+  }
+  
   subscribe(type, entity) {
     switch (type) {
       case 'CHECK_COMPLETE':
@@ -24,6 +32,7 @@ export default class TurnSystem extends System {
 	});
 	this.store.dispatch({type: "TURN_COMPLETE"});
 	break;
+
       case 'TURN_COMPLETE':
 	this.mapEntities(entity => {
 	  let render_data = getComponentData(entity, "Render");
@@ -37,6 +46,11 @@ export default class TurnSystem extends System {
 	  };
 	  this.store.dispatch(action);
 	}, ['Render', 'Count']);
+	if (this.checkEndGame()) {
+	  this.store.dispatch({ type: "END_GAME" });
+	}
+	break;
+
       default: break;
     }
   }

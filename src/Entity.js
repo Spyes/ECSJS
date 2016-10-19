@@ -1,16 +1,17 @@
 import { uniqueId } from './Utils';
 import { Map, Iterable } from 'immutable';
 
-const Entity = ({id: id} = {id: uniqueId()}) => (
+const Entity = ({type: type} = {type: ""}) => (
   {
-    id,
+    id: uniqueId(),
+    type,
     components: []
   }
 );
 export default Entity;
 
-export const createEntity = (store) => {
-  const entity = Entity();
+export const createEntity = (store, opts = {}) => {
+  const entity = Entity(opts);
   const action = { type: "ENTITY_CREATED", entity };
   store.dispatch(action);
   return entity;

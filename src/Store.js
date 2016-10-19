@@ -22,6 +22,12 @@ export default function Store() {
 	  hasComponents(entity, components)
 	)).toList().toJS()
   );
+  this.getEntitiesByType = (type) => (
+    this.data.get('entities', Map())
+	.filter(entity => (
+	  entity.get('type') === type
+	)).toList().toJS()
+  );
   this.dispatch = function (action) {
     const { type, component, entity } = action;
     switch (type) {
@@ -41,12 +47,13 @@ export default function Store() {
 	  this.data
 	      .getIn(['entities', entity.id, 'components'])
 	      .findIndex(comp => comp.get('name') === component);
+	
 	this.data =
 	  this.data.updateIn(['entities', entity.id, 'components', compidx],
 			     Map({data: Map()}),
-			     comp => comp.set('data', fromJS(action.data)));
+			     comp => comp.set('data', fromJS(action.data)));	
 	break;
-
+	
       default:
         break;
     }

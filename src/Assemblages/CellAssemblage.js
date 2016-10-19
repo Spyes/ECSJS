@@ -12,7 +12,7 @@ function clickCell(entity) {
 }
 
 export default function CellAssemblage(store) {
-  const entity = createEntity(store);
+  const entity = createEntity(store, {type: "Cell"});
   addComponents(entity,
 	       [
 		 Position(),
