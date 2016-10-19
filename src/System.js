@@ -4,15 +4,19 @@ import { hasComponents } from './Entity';
 export default class System {
   constructor({store, componentDeps}) {
     this.store = store;
-    this.componentDeps = componentDeps;
+    this.componentDeps = componentDeps || [];
   }
 
-  getEntities() {
-    return this.store
-               .get('entities', List())
-               .filter(entity => hasComponents(entity, this.componentDeps))
+  getEntities(additionalDeps = []) {
+    const deps = this.componentDeps.concat(additionalDeps);
+    return this.store.getEntities(deps);
   }
 
+  mapEntities(fun, additionalDeps = []) {
+    return this.getEntities(additionalDeps)
+	       .map(fun);
+  }
+  
   execute() {    
   }
 }

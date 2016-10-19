@@ -1,30 +1,24 @@
 import { createEntity,
-	 addComponent,
+	 addComponents,
 	 getComponentData } from '../Entity';
 import { Position, Click, Render } from '../Components';
 
 function clickCell(entity) {
-  const data = getComponentData(entity, "Render");
-  data.model = "X";
   let action = {
-    type: 'UPDATE_COMPONENT',
-    entity: entity,
-    component: 'Render',
-    data: data
+    type: "CHECK_CELL",
+    entity
   };
   this.store.dispatch(action);
 }
 
 export default function CellAssemblage(store) {
   const entity = createEntity(store);
-  addComponent(entity,
-	       Position(),
-	       store);
-  addComponent(entity,
-	       Click({onClick: clickCell}),
-	       store);
-  addComponent(entity,
-	       Render(),
+  addComponents(entity,
+	       [
+		 Position(),
+		 Click({onClick: clickCell}),
+		 Render()
+	       ],
 	       store);
   return store.get(['entities', entity.id]).toJS();
 }

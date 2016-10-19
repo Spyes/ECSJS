@@ -1,7 +1,7 @@
 import { log, times } from './Utils';
 import Store from './Store';
 import Entity, { createEntity,
-		 addComponent,
+		 addComponents,
 		 getComponentData,
 		 hasComponents } from './Entity';
 import * as Component from './Components';
@@ -19,8 +19,14 @@ const click_system_params = {
   store,
   componentDeps: ["Click"]
 };
+const turn_system_params = {
+  store,
+  componentDeps: ["Turn", "Count"]
+};
+
 const systems = [
-  new System.Click(click_system_params),  
+  new System.Click(click_system_params),
+  new System.Turn(turn_system_params),
   new System.Render(render_system_params)
 ];
 
@@ -58,14 +64,14 @@ const createCell = (idx) => {
 const cells = times(9, (_, i) => createCell(i));
 
 const turn = createEntity(store);
-addComponent(turn, Component.Count(), store);
-addComponent(turn,
-	     Component.Click({
-	       onClick: globalClick,
-	       global: true
-	     }),
+addComponents(turn,
+	      [
+		Component.Count({count: 0}),
+		Component.Turn(),
+		Component.Position({location: "turn"}),
+		Component.Render({model: "0"})
+	      ],
 	     store);
-
 let _running = true;
 function GameLoop() {
   systems.map(system => system.execute());
@@ -74,4 +80,3 @@ function GameLoop() {
   }
 }
 requestAnimationFrame(GameLoop);
-

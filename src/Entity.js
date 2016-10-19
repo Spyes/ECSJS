@@ -21,11 +21,15 @@ export const addComponent = (entity, component, store) => {
   store.dispatch(action);
 };
 
+export const addComponents = (entity, components, store) => {
+  components.map(comp => addComponent(entity, comp, store));
+};
+
 export const getComponentData = (entity, component_name) => {
   const component = getComponent(entity, component_name);
   const is_iter = Iterable.isIterable(component);
   if (is_iter) return component.get('data', Map());
-  return component.data || {};
+  return component ? component.data : {};
 };
 
 export const getComponent = (entity, component_name) => {

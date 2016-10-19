@@ -1,5 +1,6 @@
 import { Map, List, fromJS } from 'immutable';
 import { result } from './Utils';
+import { hasComponents } from './Entity';
 
 export default function Store() {
   this.data = Map({
@@ -15,6 +16,12 @@ export default function Store() {
     return this.data
 	       .get(reducer, defaultValue);
   };
+  this.getEntities = (components) => (
+    this.data.get('entities', Map())
+	.filter(entity => (
+	  hasComponents(entity, components)
+	)).toList().toJS()
+  );
   this.dispatch = function (action) {
     const { type, component, entity } = action;
     switch (type) {
@@ -35,7 +42,8 @@ export default function Store() {
 	      .getIn(['entities', entity.id, 'components'])
 	      .findIndex(comp => comp.get('name') === component);
 	this.data =
-	  this.data.updateIn(['entities', entity.id, 'components', compidx], Map({data: Map()}),
+	  this.data.updateIn(['entities', entity.id, 'components', compidx],
+			     Map({data: Map()}),
 			     comp => comp.set('data', fromJS(action.data)));
 	break;
 
