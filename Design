@@ -1,0 +1,46 @@
+ECSJS - Entity Component System written in ECMAScript 6
+
+Entity - an empty container that only has two properties: a
+unique ID and a List of components (non-unique)
+
+Component - a container that only holds component's type and data, no logic or functionality
+
+System - the game logic. Systems are responsible for actually doing the logic
+and functionality of the game using components' data. A system can use
+multiple components and is not bound to only one type of component. Systems
+talk to each other via message, by subscribing to certain message types and
+dispatching messages.
+
+Entity Manager - all actions related to creating new entities, adding
+components to them, querying them, etc.
+  * createEntity() - returns an empty entity object with a unique id
+  * getEntity(id) - returns an entity with the specific id or undefined
+  * addComponent(entity_id, component_object) - adds the component object
+  to the specified entity
+
+Component Manager - holds a store of all available component types (NOT
+created components), also allows defining new component types
+  * defineComponent(name, {props: {}, defaultProps: {}, mandatoryProps: []}) -
+  creates a new component type; adds to the available components store
+  * getComponent(name, {props}) - returns a new component object with the
+  specified props
+
+System Manager - stores all available systems. Responsible for initiating them
+on start up and allows specifying the order of execution. Allows definition of
+new systems.
+  * setSystemsPriority({system: priority}) - sets the order of execution of
+  systems; Lower priority numbers are executed first
+  * defineSystem(name, {system}, priority) -
+
+Messenger - the messaging system. Allows subscribing to certain
+events/messages and dispatching messages. Holds a store of all subscribers
+grouped by event/message type. 
+  * subscribe([messages], function) - adds function to the subscribers store
+  under the specified messages; this function is run every time a matching
+  message is dispatched
+  * dispatch(message, {data}) - dispatch a message with specified data. This
+  data gets passed along to any subscribers
+
+Assemblage - a predefined entity with components attached to it. Does all
+functions that one would normally do via Entity Manager (createEntity,
+addComponent) and returns the newly created entity.
